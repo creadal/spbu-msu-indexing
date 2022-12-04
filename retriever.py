@@ -8,6 +8,7 @@ class Retriever:
 class JsonRetriever(Retriever):
     def __init__(self, files):
         self.files = iter(files)
+        self.files_list = files
 
         self.parser = Parser()
         self.get_next_text()
@@ -34,10 +35,10 @@ class JsonRetriever(Retriever):
 
     def __next__(self):
         try:
-            return next(self.current_text)
+            return next(self.current_text), self.current_filename
         except StopIteration:
             status = self.get_next_text()
             if not status:
                 raise StopIteration
             else:
-                return next(self.current_text)
+                return next(self.current_text), self.current_filename

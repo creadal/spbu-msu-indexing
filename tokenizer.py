@@ -51,9 +51,9 @@ class Tokenizer:
         file = None
         if write_immedeately:
             file = open(write_location, 'w+')
-            file.write('{\n')
+            file.write('[\n')
 
-        for word in tqdm(r):
+        for word, _ in tqdm(r):
             token = self.tokenize(word, add_to_dict=True)
 
             if not token is None:
@@ -62,7 +62,7 @@ class Tokenizer:
                         file.write(f'\t\'{token}\',\n')
 
         if write_immedeately:
-            file.write('}')
+            file.write(']')
             file.close()
 
         return self
