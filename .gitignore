@@ -1,0 +1,7 @@
+data.zip
+/data
+/samples
+/__pycache__
+/tests/__pycache__
+.DS_Store
+test.py
