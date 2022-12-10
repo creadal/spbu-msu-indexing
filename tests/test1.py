@@ -7,6 +7,10 @@ from indexer import Indexer
 from encoder import GammaEncodedIndex
 
 class TestIndexers(unittest.TestCase):
+    '''
+        Indexer and Gamma-indexer are equal (give the same results)
+    '''
+
     def setUp(self):
         # creating an instance of the tested class
         files = glob(os.path.join('data', 'data-spbu', '*.json'))

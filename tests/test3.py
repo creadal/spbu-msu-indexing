@@ -6,6 +6,10 @@ from tokenizer import Tokenizer
 from indexer import Indexer
 
 class TestIndexer(unittest.TestCase):
+    '''
+        Test different Indexer queries
+    '''
+
     def setUp(self):
         # creating an instance of the tested class
         self.t = Tokenizer()
