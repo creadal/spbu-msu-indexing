@@ -36,11 +36,8 @@ class TestIndexer(unittest.TestCase):
         files = glob(os.path.join('samples', 'test3', 'three.json'))
         r = JsonRetriever(files)
         self.i.create_index(r)
-        try:
-            self.i.find("телефон")
-            self.assertEqual(1,0, "mispell excepted")
-        except:
-            self.assertEqual(1,1, "word not found")
+        with self.assertRaises(KeyError):
+            self.i.find("телеофн")
 
     def test_numbers(self):
         files = glob(os.path.join('samples', 'test3', 'three.json'))
@@ -65,4 +62,10 @@ class TestIndexer(unittest.TestCase):
         files = glob(os.path.join('samples', 'test3', 'three.json'))
         r = JsonRetriever(files)
         self.i.create_index(r)
-        self.assertEqual(self.i.find("номер"), {1: 1}, "existed word")        
+        self.assertEqual(self.i.find("номер"), {1: 1}, "existed word")
+
+    def test_two_words_in_query(self):
+        files = glob(os.path.join('samples', 'test3', 'three.json'))
+        r = JsonRetriever(files)
+        self.i.create_index(r)
+        self.assertEqual(self.i.find("позвонит телефон"), {1: 2}, "existed words in one doc")

@@ -44,4 +44,7 @@ class TestGammaIndexer(unittest.TestCase):
             self.ig.find("сибирь")
 
     def test_input_diff_symbols(self):
-        self.assertEqual(self.ig.find("!ОвОщИ!!!9827346___"), {3: 1}, "exept a dirty query")
+        self.assertEqual(self.ig.find("!ОвОщИ!!!9827346___"), {3: 1}, "handling a bad request")
+
+    def test_two_words_in_query(self):
+        self.assertEqual(self.ig.find("люблю овощи"), {2: 1, 3: 1}, "existed words but not together")
