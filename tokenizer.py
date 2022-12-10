@@ -90,8 +90,8 @@ class Tokenizer:
         word = word.translate(str.maketrans('', '', punctuation))
         token = self.stemmer.stem(word)
         
-        if token in self.russian_stopwords:
-            return None
+        if token in self.russian_stopwords or len(token) == 0:
+            return None 
         else:
             if not token in self.dictionary:
                 if add_to_dict:

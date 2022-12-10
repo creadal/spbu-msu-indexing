@@ -75,15 +75,77 @@ class GammaEncodedIndex(Indexer):
 
         return results
 
-if __name__ == '__main__':
-    files = glob(os.path.join('data', 'data-spbu', '*.json'))
-    files.remove(os.path.join('data', 'data-spbu', 'stats.json'))
 
-    r = JsonRetriever(files[:100])
+class DeltaEncodedIndex(Indexer):
+    def __init__(self, i: Indexer):
+        self.t = i.t
+        self.sources = i.sources
+        self.index = self.compress(i.index)
 
-    t = Tokenizer()
-    i = Indexer(t).create_index(r)
-    ig = GammaEncodedIndex(i)
+    def compress(self, index: dict):
+        new_index = {}
+        for word in tqdm(index):
+            new_value = '0b'
+            for pos in index[word]:
+                if pos == 1:
+                    new_value += '1'
+                else:
+                    N = int(np.log2(pos))
+                    L = int(np.log2(N + 1))
+                    new_value += '0' * L
+                    new_value += bin(N+1)[2:]
+                    leftover = bin(pos - np.power(2, N))[2:]
+                    new_value += '0' * (N - (len(leftover)))
+                    new_value += leftover
 
-    print(i.index['д'])
-    print(ig.decode(ig.index['д']))
+            new_index[word] = new_value
+        return new_index
+
+
+    def decode(self, s: str):
+        pos_list = []
+        ended = False
+        i = 2
+        while True:
+            if ended:
+                break
+            L = 0
+            while True:
+                try:
+                    c = s[i]
+                except IndexError:
+                    ended = True
+                    break
+
+                if c == '0':
+                    L += 1
+                else:
+                    if L == 0:
+                        pos_list.append(1)
+                    else:
+                        N = '0b' + s[i:i+L+1]
+                        N = int(N, base=2) - 1 if N != '0b' else 0
+                        leftover = '0b' + s[i+L+1:i+L+1+N]
+                        base = np.power(2, N)
+                        leftover = int(leftover, base=2) if leftover != '0b' else 0
+                        pos_list.append(base + leftover)
+                        i += N + L + 1
+                        break
+                
+                i += 1
+        return pos_list
+
+    def find(self, query):
+        words = [self.t.tokenize(word, add_to_dict=False) for word in query.split()]
+        results = {}
+
+        for word in words:
+            position = 0
+            for result in self.decode(self.index[word]):
+                position += result
+                if position not in results:
+                    results[position] = 1
+                else:
+                    results[position] += 1
+
+        return results

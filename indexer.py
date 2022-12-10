@@ -25,6 +25,7 @@ class Indexer:
         
         print('started indexing')
         for word, file in tqdm(r):
+        # for word, file in r:
             token = self.t.tokenize(word, add_to_dict=True)
             self.add_to_index(token, file)
 
@@ -54,12 +55,15 @@ class Indexer:
 
         for word in words:
             position = 0
-            for result in self.index[word]:
-                position += result
-                if position not in results:
-                    results[position] = 1
-                else:
-                    results[position] += 1
+            try:
+                for result in self.index[word]:
+                    position += result
+                    if position not in results:
+                        results[position] = 1
+                    else:
+                        results[position] += 1
+            except KeyError:
+                pass
 
         return results
 
